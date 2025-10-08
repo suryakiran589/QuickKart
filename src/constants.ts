@@ -25,5 +25,5 @@ export const filters = {
     "womens-shoes",
     "womens-watches",
   ],
-  ratings:["4","3"]
+  ratings:["4","3"],
 };
