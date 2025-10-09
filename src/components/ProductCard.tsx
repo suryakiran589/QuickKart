@@ -4,9 +4,9 @@ const ProductCard = ({product}:{product:any}) => {
     function generatePurchases() {
         return Math.floor(Math.random() * (5000 - 50 + 1)) + 50; // 50 to 5000
     }
-    const ratingBg = parseInt(product.rating) < 3 ?"#d49b22": "#4c9950" 
+ 
   return (
-    <div className="group w-72 py-9 px-6 hover:shadow-lg hover:cursor-pointer">
+    <div className="group flex-1 max-h-[400px] min-w-[260px] max-w-[300px] w-72 py-4 px-6 hover:shadow-lg hover:cursor-pointer">
       <div>
         <img src={product.images[0]} className="h-64" alt="" />
       </div>
