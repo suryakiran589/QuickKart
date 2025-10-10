@@ -27,3 +27,5 @@ export const filters = {
   ],
   ratings:["4","3"],
 };
+
+export const sortings=["Relevence","Popularity","Price -- Low to High","Price -- High to Low","Discount"]
