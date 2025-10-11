@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 
 
 const ProductCard = ({product}:{product:any}) => {
@@ -7,6 +8,7 @@ const ProductCard = ({product}:{product:any}) => {
  
   return (
     <div className="group flex-1 max-h-[400px] min-w-[260px] max-w-[300px] w-72 py-4 px-6 hover:shadow-lg hover:cursor-pointer">
+      <Link to={"/" + product.id} className="text-black">
       <div>
         <img src={product.images[0]} className="h-64" alt="" />
       </div>
@@ -23,7 +25,7 @@ const ProductCard = ({product}:{product:any}) => {
             <div className="inline-block text-xs ml-2 font-bold text-[#388e3c]">{product.discountPercentage}% off</div>
         </div>
       </div>
-
+</Link>
     </div>
   )
 }
