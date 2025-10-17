@@ -4,6 +4,7 @@ import RatingFilters from "../components/RatingFilters";
 import ProductList from "../components/ProductList";
 import PriceFilters from "../components/PriceFilters";
 import { sortings } from "../constants";
+import { Link } from "react-router-dom";
 
 interface review{
   rating:number,
@@ -43,9 +44,13 @@ const Home = () => {
   const [showFilters, setShowFilters] = useState(false)
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchText,setSearchText] = useState("")
+  const [searchResults,setSearchResults] = useState([])
+  const [showSearchResults,setShowSearchResults] = useState(false)
 
   
   useEffect(() => {
+
     setIsLoading(true);
     fetch("https://dummyjson.com/products?limit=150")
     .then((res) => res.json())
@@ -58,6 +63,19 @@ const Home = () => {
       setIsLoading(false);
     });
   }, []);
+
+  useEffect(() =>{
+    const timer = setTimeout(() => {
+      fetch('https://dummyjson.com/products/search?q='+searchText)
+.then(res => res.json())
+.then((data) => {
+  setSearchResults(data.products)
+});
+    }, 1500);
+    return () => {
+      clearTimeout(timer)
+    }
+  },[searchText])
 
     useEffect(() => {
     setCurrentPage(1);
@@ -130,25 +148,39 @@ const Home = () => {
   }
   
   return (
- <div className="flex flex-col lg:flex-row min-h-screen w-full max-w-full overflow-x-hidden bg-gray-50">
+    <div>
+
+  <div className="fixed z-30 h-14 w-screen flex flex-col items-center  justify-center bg-[#2874f0]">
+        <input type="text" className="outline-none p-2 w-2/5" value={searchText} onFocus={() => {setShowSearchResults(true)}} onChange={(e)=>setSearchText(e.target.value)}/>
+        
+      {showSearchResults && <div className=" w-screen  absolute h-[100vw]" onClick={() => {setShowSearchResults(false)}}>
+        
+        <ul className="absolute top-[51%] left-[30%]  border-2  w-2/5  h-80 overflow-x-scroll bg-white">
+        {
+          searchResults &&  searchResults.map((obj) => <Link to={"/" +obj.id} className="list-none text-black "><li className="list-none p-2 text-sm hover:bg-[#f1f3f6]">{obj.title}</li> </Link>)
+        }
+        </ul>
+      </div>}
+        </div>
+ <div className="flex flex-col lg:flex-row min-h-screen w-full max-w-full overflow-x-hidden pt-10  bg-gray-50">
     {/* Mobile Filter Toggle Button */}
     <button
       onClick={() => setShowFilters(!showFilters)}
       className="lg:hidden fixed bottom-4 right-4 z-50 bg-[#2874f0] text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-sm font-semibold"
       aria-label="Toggle filters"
-    >
+      >
       <svg
         className="w-5 h-5"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
-      >
+        >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
           d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-        />
+          />
       </svg>
       Filters
     </button>
@@ -156,8 +188,8 @@ const Home = () => {
     {/* Overlay for mobile filters */}
     {showFilters && (
       <div
-        className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
-        onClick={() => setShowFilters(false)}
+      className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+      onClick={() => setShowFilters(false)}
       />
     )}
 
@@ -173,27 +205,27 @@ const Home = () => {
         transform transition-transform duration-300 ease-in-out
         flex-shrink-0
         ${showFilters ? "translate-x-0" : "-translate-x-[105%] lg:translate-x-0"}
-      `}
-      aria-label="Filters"
-    >
+        `}
+        aria-label="Filters"
+        >
       {/* Close button for mobile */}
       <button
         onClick={() => setShowFilters(false)}
         className="lg:hidden absolute top-3 right-3 p-2 text-gray-500 hover:text-gray-700"
         aria-label="Close filters"
-      >
+        >
         <svg
           className="w-6 h-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
-        >
+          >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
             d="M6 18L18 6M6 6l12 12"
-          />
+            />
         </svg>
       </button>
 
@@ -204,21 +236,22 @@ const Home = () => {
       <CategoryFilters
         selectedCategories={selectedCategories}
         setSelectedCategories={setSelectedCategories}
-      />
+        />
 
       <RatingFilters
         selectedRating={selectedRating}
         setSelectedRating={setSelectedRating}
-      />
+        />
 
       <PriceFilters
         selectedPriceRange={selectedPriceRange}
         setSelectedPriceRange={setSelectedPriceRange}
-      />
+        />
     </aside>
 
     {/* Main Content */}
     <main className="flex-1 w-full lg:w-auto overflow-x-hidden min-w-0">
+      
       {/* Sort Bar */}
       <div className="flex px-3 sm:px-4 pt-3 sm:pt-4 text-sm items-center border-b border-slate-300 overflow-x-auto scrollbar-hide w-full">
         <span className="font-bold pr-3 flex-shrink-0 whitespace-nowrap">
@@ -227,13 +260,13 @@ const Home = () => {
         <div className="flex gap-2 flex-nowrap overflow-x-auto scrollbar-hide w-full max-w-full">
           {sortings.map((sort, i) => (
             <button
-              key={i}
-              onClick={() => setSelectedSort(i)}
-              className={`pb-2 px-3 text-xs sm:text-sm cursor-pointer whitespace-nowrap border-none bg-transparent flex-shrink-0 ${
-                i === selectedSort
-                  ? "font-bold text-[#2874f0] border-b-2 border-[#2874f0]"
-                  : "text-gray-700"
-              }`}
+            key={i}
+            onClick={() => setSelectedSort(i)}
+            className={`pb-2 px-3 text-xs sm:text-sm cursor-pointer whitespace-nowrap border-none bg-transparent flex-shrink-0 ${
+              i === selectedSort
+              ? "font-bold text-[#2874f0] border-b-2 border-[#2874f0]"
+              : "text-gray-700"
+            }`}
             >
               {sort}
             </button>
@@ -243,6 +276,7 @@ const Home = () => {
 
       {/* Products */}
       <div className="w-full overflow-x-hidden">
+        
         {filteredList.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             <p className="text-lg font-semibold mb-2">No products found</p>
@@ -256,21 +290,21 @@ const Home = () => {
       {/* Pagination */}
       {totalPages > 1 && (
         <nav
-          className="flex justify-center items-center w-full px-2 pb-20 lg:pb-5"
-          aria-label="Pagination"
+        className="flex justify-center items-center w-full px-2 pb-20 lg:pb-5"
+        aria-label="Pagination"
         >
           <div className="py-5 flex flex-wrap gap-2 justify-center">
             {Array.from({ length: totalPages }, (_, i) => (
               <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`content-center text-center ${
-                  currentPage === i + 1
-                    ? "bg-[#2874f0] text-white"
-                    : "text-black bg-gray-100"
-                } h-8 w-8 sm:h-10 sm:w-10 rounded-full p-0 border-none text-sm sm:text-base font-medium hover:bg-[#2874f0] hover:text-white transition-colors`}
-                aria-label={`Go to page ${i + 1}`}
-                aria-current={currentPage === i + 1 ? "page" : undefined}
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`content-center text-center ${
+                currentPage === i + 1
+                ? "bg-[#2874f0] text-white"
+                : "text-black bg-gray-100"
+              } h-8 w-8 sm:h-10 sm:w-10 rounded-full p-0 border-none text-sm sm:text-base font-medium hover:bg-[#2874f0] hover:text-white transition-colors`}
+              aria-label={`Go to page ${i + 1}`}
+              aria-current={currentPage === i + 1 ? "page" : undefined}
               >
                 {i + 1}
               </button>
@@ -280,6 +314,7 @@ const Home = () => {
       )}
     </main>
   </div>
+      </div>
 );
 
 };
