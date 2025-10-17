@@ -157,7 +157,7 @@ const Home = () => {
         
         <ul className="absolute top-[51%] left-[30%]  border-2  w-2/5  h-80 overflow-x-scroll bg-white">
         {
-          searchResults &&  searchResults.map((obj) => <Link to={"/" +obj.id} className="list-none text-black "><li className="list-none p-2 text-sm hover:bg-[#f1f3f6]">{obj.title}</li> </Link>)
+          searchResults &&  searchResults.map((obj:Product) => <Link to={"/" +obj.id} className="list-none text-black "><li className="list-none p-2 text-sm hover:bg-[#f1f3f6]">{obj.title}</li> </Link>)
         }
         </ul>
       </div>}
